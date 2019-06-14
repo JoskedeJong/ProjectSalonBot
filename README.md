@@ -4,11 +4,10 @@ Goal: to expand a pre-created PHP bot for the Line app to accommodate to the nee
 
 
 #### Development Goals
-* [ ] Get pre-created bot up and running. 
-* [ ] Set up several hard-coded responses.
-* [ ] 
-* [ ] 
-* [ ] 
+* [x] Get pre-created bot up and running. 
+* [x] Set up hard-coded test-response.
+* [ ] create opening message with buttons
+
 
 
 #### Personal goals
@@ -22,8 +21,8 @@ Goal: to expand a pre-created PHP bot for the Line app to accommodate to the nee
 User stories, prioritzed and labeled by subject.
 
 | **Als een** | **Wil ik ...** | **Zodat ...** | **Onderwerp** |
-| --- | --- | --- ||
-|  | Top Priority |||
+| --- | --- | --- | --- |
+| | Top Priority | | |
 | developer | na het sturen van *TEST* aan de bot een reactie  *TESTOK* terugkrijgen | ik kan controleren of mijn bot actief in en werkt | hardcode |
 | klant | de openingstijden van de gehele week kunnen opvragen | ik hiermee rekening kan houden in mijn agenda en planning | hardcode, database |
 | klant | de tarievenlijst opvragen | ik een overzicht krijg van mogelijkheden en kosten | hardcode |
@@ -33,12 +32,12 @@ User stories, prioritzed and labeled by subject.
 | klant | een review kunnen achterlaten na afloop van een ingeplande behandeling | ik kan doorgeven wat er goed gaat en wat er nog beter kan | feedback |
 | manager | de review berichten van klanten zien | ik mijn bedrijf en diensten kan verbeteren | feedback |
 | manager | eenvoudig en vlot mijn klanten kunnen bedanken voor echt goed reviews | mijn klanten weten wat ik met de feedback ga doen | feedback |
-| manager | een backup van de chatbot instellingen en data kunnen downloaden | ik mijn gegevens kan bewaren | data-acces|
-| manager | een backup weer kunnen inladen | ik mijn bot kan herstellen na een crash | data-acces|
+| manager | een backup van de chatbot instellingen en data kunnen downloaden | ik mijn gegevens kan bewaren | data-acces |
+| manager | een backup weer kunnen inladen | ik mijn bot kan herstellen na een crash | data-acces |
 | --- | --- | --- | --- |
-|| Medium Priority |||
+| | Medium Priority | | |
 | klant | snel de openingstijden van vandaag kunnen opvragen | ik weet of het bedrijf nu open is | hardcode |
-| klant | een route naar het bedrijf opvragen | ik weet hoe ik bij het bedrijf kom | API-integratie (google)|
+| klant | een route naar het bedrijf opvragen | ik weet hoe ik bij het bedrijf kom | API-integratie (google) |
 | klant | weten waneer ik terecht kan voor een specifieke behandeling | ik daarna een afspraak kan maken | database |
 | klant | afspraak maken op eerste mogelijkheid | ik zo snel mogelijk aan de beurt ben | database, manipulation |
 | klant | afspraak maken voor een speciek moment en behandeling | ik kan afspreken dat dit in mijn agenda past | database, manipulation |
@@ -73,6 +72,3 @@ User stories, prioritzed and labeled by subject.
 | manager | dat er elke zaterdag op basis van de nederlandse lotto trekking een winnende klant wordt aangewezen | deze een gratis behandeling wint | promo, api-integration |
 | platform | templates kunnen maken met chatbot instellingen | ik bedrijven een template kan leveren met instellingen om direct aan de slag te gaan | data-access |
 | platform | een catalogus met chatbot templates hebben | ik bij demonstraties en verkoop snel een passende template kan vinden | portal, data access |
-| --- | --- | --- | --- |
-
-
