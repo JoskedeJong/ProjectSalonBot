@@ -8,8 +8,10 @@ require '../vendor/autoload.php';
 
 use LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\Uri\AltUriBuilder;
+use LINE\LINEBot\Constant\Flex\ComponentAlign; // added
 use LINE\LINEBot\Constant\Flex\ComponentButtonHeight;
 use LINE\LINEBot\Constant\Flex\ComponentButtonStyle;
+use LINE\LINEBot\Constant\Flex\ContainerDirection; // added
 use LINE\LINEBot\Constant\Flex\ComponentFontSize;
 use LINE\LINEBot\Constant\Flex\ComponentFontWeight;
 use LINE\LINEBot\Constant\Flex\ComponentIconSize;
@@ -29,9 +31,6 @@ use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\SpacerComponentBuilder;
 use LINE\LINEBot\MessageBuilder\Flex\ComponentBuilder\TextComponentBuilder;
 use LINE\LINEBot\MessageBuilder\Flex\ContainerBuilder\BubbleContainerBuilder;
 
-//own entries
-use LINE\LINEBot\Constant\Flex\ContainerDirection;
-use LINE\LINEBot\Constant\Flex\ComponentAlign;
 
 use \LINE\LINEBot\SignatureValidator as SignatureValidator;
 
@@ -161,6 +160,47 @@ class FlexSampleRestaurant
     }
 }
 
+class WelcomeMsg
+{
+	public static function get()
+	{
+		return FlexMessageBuilder::builder()
+		-> setAltText ("Flex Message")
+		-> setContents(
+			BubbleContainerBuilder::builder()
+			-> setDirection(ContainerDirection::LTR)
+			-> setHeader (self::createHeaderBlock())
+			-> setBody (self::createBodyBlock())
+			// -> setFooter (self::createFooterBlock())
+		);
+	}
+
+	private static function createHeaderBlock()
+	{
+		return BoxComponentBuilder::builder()
+		->setLayout(ComponentLayout::VERTICAL)
+		->setContents([
+			TextComponentBuilder::builder()
+			->setText("Welkom!")
+			// ->setLayout(ComponentLayout::VERTICAL)
+			->setAlign(ComponentAlign::CENTER)
+		]);
+	}
+
+	private static function createBodyBlock()
+	{
+		return BoxComponentBuilder::builder()
+		->setLayout(ComponentLayout::VERTICAL)
+		->setContents([
+			TextComponentBuilder::builder()
+			->setText("Ik ben SalonBot, waar kan ik je mee helpen?")
+			->setFlex(0)
+			->setAlign(ComponentAlign::CENTER)
+			->setWrap(true)
+		]);
+	}
+}
+
 
 //_________________________________________________________ app initiate + hard coded msg ________________________________________________
 
@@ -173,7 +213,14 @@ $app = new Slim\App($configs);
 
 /* ROUTES */
 $app->get('/', function ($request, $response) {
-	return $response->withStatus(200, 'Okido');
+
+	$data = WelcomeMsg::get();
+	print_r($data);
+
+
+
+	
+	//sreturn $response->withStatus(200, 'Okido');
 });
 
 $app->post('/', function ($request, $response)
@@ -220,6 +267,16 @@ $app->post('/', function ($request, $response)
 		{
 			// $data = welcomeMsg::get();
 			$data = FlexSampleRestaurant::get();
+            file_put_contents('php://stderr', 'reply data: ' . print_r($data, true));
+			$result = $bot->replyMessage($event['replyToken'], $data);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		
+		}
+
+		if(strtolower($userMessage) == 'show')
+		{
+			$data = WelcomeMsg::get();
+			// $data = FlexSampleRestaurant::get();
             file_put_contents('php://stderr', 'reply data: ' . print_r($data, true));
 			$result = $bot->replyMessage($event['replyToken'], $data);
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
