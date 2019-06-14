@@ -146,9 +146,10 @@ class FlexSampleRestaurant
             ->setHeight(ComponentButtonHeight::SM)
             ->setAction(
                 new UriTemplateActionBuilder(
-                    'WEBSITE',
+					'uri',
+                    'Openingstijden',
                     'https://example.com',
-                    new AltUriBuilder('https://example.com#desktop')
+                    new AltUriBuilder('https://www.google.com')
                 )
             );
         $spacer = new SpacerComponentBuilder(ComponentSpaceSize::SM);
@@ -171,7 +172,7 @@ class WelcomeMsg
 			-> setDirection(ContainerDirection::LTR)
 			-> setHeader (self::createHeaderBlock())
 			-> setBody (self::createBodyBlock())
-			// -> setFooter (self::createFooterBlock())
+			-> setFooter (self::createFooterBlock())
 		);
 	}
 
@@ -198,6 +199,30 @@ class WelcomeMsg
 			->setAlign(ComponentAlign::CENTER)
 			->setWrap(true)
 		]);
+	}
+
+	private static function createFooterBlock()
+	{
+		$button1 = ButtonComponentBuilder::builder()
+			->setAction(
+				new UriTemplateActionBuilder(
+				'Openingstijden',
+				'https://www.google.com'
+				// new AltUriBuilder('https://www.nu.nl')
+				)
+			);
+		$button2 = ButtonComponentBuilder::builder()
+		->setAction(
+			new UriTemplateActionBuilder(
+			'Openingstijden2',
+			'https://www.google.com'
+			// new AltUriBuilder('https://www.nu.nl')
+			)
+		);
+		return BoxComponentBuilder::builder()
+		-> setLayout(ComponentLayout::VERTICAL)
+		-> setContents([$button1, $button2]);	
+
 	}
 }
 
@@ -246,6 +271,7 @@ $app->post('/', function ($request, $response)
 	$httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient($_ENV['CHANNEL_ACCESS_TOKEN']);
 	$bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $_ENV['CHANNEL_SECRET']]);
 	$data = json_decode($body, true);
+	
 	foreach ($data['events'] as $event)
 	{
 		$userMessage = $event['message']['text'];
@@ -301,3 +327,35 @@ $app->post('/', function ($request, $response)
 });
 
 $app->run();
+
+
+
+// "footer": {
+// 	"type": "box",
+// 	"layout": "vertical",
+// 	"contents": [
+// 	  {
+// 		"type": "button",
+// 		"action": {
+// 		  "type": "uri",
+// 		  "label": "Openingstijden",
+// 		  "uri": "https://linecorp.com"
+// 		}
+// 	  },
+// 	  {
+// 		"type": "button",
+// 		"action": {
+// 		  "type": "message",
+// 		  "label": "Afspraak",
+// 		  "text": "Afspraak"
+// 		}
+// 	  },
+// 	  {
+// 		"type": "button",
+// 		"action": {
+// 		  "type": "message",
+// 		  "label": "Anders",
+// 		  "text": "Anders"
+// 		}
+// 	  }
+// 	]
