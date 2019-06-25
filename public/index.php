@@ -2,10 +2,6 @@
 session_start();
 require '../vendor/autoload.php';
 
-// file_put_contents('php://stdout', 'this is a test as well');
-// error_log("hello, this is a test!");
-
-
 use LINE\LINEBot\TemplateActionBuilder\UriTemplateActionBuilder;
 use LINE\LINEBot\TemplateActionBuilder\Uri\AltUriBuilder;
 use LINE\LINEBot\Constant\Flex\ComponentAlign; // added
@@ -227,7 +223,6 @@ class WelcomeMsg
 }
 
 
-//_________________________________________________________ app initiate + hard coded msg ________________________________________________
 
 
 // initiate app
@@ -237,12 +232,11 @@ $configs =  [
 $app = new Slim\App($configs);
 
 /* ROUTES */
-$app->get('/', function ($request, $response) {
+$app->get('/', function ($request, $response) {      
 
-	$data = WelcomeMsg::get();
+	$data = WelcomeMsg::get();    						 //delete when done
+	// $data = $userFollow::get();
 	print_r($data);
-
-
 
 	
 	//sreturn $response->withStatus(200, 'Okido');
@@ -272,12 +266,24 @@ $app->post('/', function ($request, $response)
 	$bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $_ENV['CHANNEL_SECRET']]);
 	$data = json_decode($body, true);
 	
+//________________________________________________________________________messages_____________________________________________________________________________
+
 	foreach ($data['events'] as $event)
 	{
 		$userMessage = $event['message']['text'];
 
-		// $thesender = $event['source']['userId']; //added
+		// $userFollow = $event['follow'];
+
 		file_put_contents('php://stderr', " ----- "); //added
+
+		// if ($userFollow == true)
+		// {
+		// 	$message = "Deze bot herkent dat je een nieuwe gebruiker bent";
+        //     $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+		// 	$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+		// 	return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		
+		// }
 
 
 		if(strtolower($userMessage) == 'test')
@@ -309,6 +315,59 @@ $app->post('/', function ($request, $response)
 		
 		}
 
+		if(strtolower($userMessage) == 'tarieven')
+		{
+			$message = "De tarieven zijn: 50 euro per behandeling";
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		}
+
+		if(strtolower($userMessage) == 'data')
+		{
+			// $db = $GLOBALS['db'];
+			// $message = query('SELECT 2 FROM test_table1');
+
+			$host= $_ENV['DATABASE_HOST'];
+			$dbname= $_ENV['DATABASE_NAME'];
+			$user= $_ENV['DATABASE_USERNAME']; 
+			$password= $_ENV['DATABASE_PASSWORD'];
+			$port= $_ENV['DATABASE_PORT'];
+			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
+			// var_dump($username);
+			// var_dump($password);
+			
+			$message_data = pg_query($db_connection, 'SELECT * FROM test_table1');
+		
+			$message = "";
+			while ($row = pg_fetch_row($message_data)) {
+					$message .= "$row[1] : $row[2] - ";
+				}
+			// $message = "host=$blahost, dbname=$dbname, user=$user, password=$password, port=$port";
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		}
+
+		if(strtolower($userMessage) == 'vardump')
+		{
+
+			$host= $_ENV['DATABASE_HOST'];
+			$dbname= $_ENV['DATABASE_NAME'];
+			$user= $_ENV['DATABASE_USERNAME']; 
+			$password= $_ENV['DATABASE_PASSWORD'];
+			$port= $_ENV['DATABASE_PORT'];
+			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
+			
+		
+			$message = "host=$host, dbname=$dbname, user=$user, password=$password, port=$port";
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		}
+
+		
+
 		// if(strtolower($userMessage) == 'open')
 		// {
 		// 	$externalreply=file_get_contents('openingmessage.json');
@@ -327,35 +386,3 @@ $app->post('/', function ($request, $response)
 });
 
 $app->run();
-
-
-
-// "footer": {
-// 	"type": "box",
-// 	"layout": "vertical",
-// 	"contents": [
-// 	  {
-// 		"type": "button",
-// 		"action": {
-// 		  "type": "uri",
-// 		  "label": "Openingstijden",
-// 		  "uri": "https://linecorp.com"
-// 		}
-// 	  },
-// 	  {
-// 		"type": "button",
-// 		"action": {
-// 		  "type": "message",
-// 		  "label": "Afspraak",
-// 		  "text": "Afspraak"
-// 		}
-// 	  },
-// 	  {
-// 		"type": "button",
-// 		"action": {
-// 		  "type": "message",
-// 		  "label": "Anders",
-// 		  "text": "Anders"
-// 		}
-// 	  }
-// 	]
