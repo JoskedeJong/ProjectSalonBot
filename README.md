@@ -8,7 +8,8 @@ Goal: to expand a pre-created PHP bot for the Line app to accommodate to the nee
 * [x] Set up hard-coded test-response.
 * [ ] create opening message with buttons
 * [x] create connection with database
-* [ ] allw user to create modifications in database
+* [x] allow user to create modifications in database
+* * [ ] bugfix alteration of order database
 * [ ] concentrate connection calls into single function
 
 

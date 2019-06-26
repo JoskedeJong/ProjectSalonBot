@@ -367,7 +367,7 @@ $app->post('/', function ($request, $response)
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
 		}
 
-		if(strtolower($userMessage) == 'make1')									// shows entire test table
+		if(strtolower($userMessage) == 'conf')									// should change Fridays promotions to conference
 		{
 
 			$host= $_ENV['DATABASE_HOST'];
@@ -378,8 +378,36 @@ $app->post('/', function ($request, $response)
 			// $db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
 			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
 
+			$condition = array('id'=>2, 'day'=>'Friday', 'activity'=>'Promotions');
+			$newarr = array('id'=>2, 'day'=>'Friday', 'activity'=>'Conference');
+			pg_update ($db_connection, 'test_table1' , $newarr , $condition);
 
-			// pg_q
+			$message_data = pg_query($db_connection, 'SELECT * FROM test_table1');
+		
+			$message = "";
+			while ($row = pg_fetch_row($message_data)) {
+					$message .= "$row[1] : $row[2] - ";
+				}
+			// $message = "host=$blahost, dbname=$dbname, user=$user, password=$password, port=$port";
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		}
+
+		if(strtolower($userMessage) == 'prom')									// should change Fridays conference to promotions
+		{
+
+			$host= $_ENV['DATABASE_HOST'];
+			$dbname= $_ENV['DATABASE_NAME'];
+			$user= $_ENV['DATABASE_USERNAME']; 
+			$password= $_ENV['DATABASE_PASSWORD'];
+			$port= $_ENV['DATABASE_PORT'];
+			// $db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
+			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
+
+			$condition = array('id'=>2, 'day'=>'Friday', 'activity'=>'Conference');
+			$newarr = array('id'=>2, 'day'=>'Friday', 'activity'=>'Promotions');
+			pg_update ($db_connection, 'test_table1' , $newarr , $condition);
 
 			$message_data = pg_query($db_connection, 'SELECT * FROM test_table1');
 		
