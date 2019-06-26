@@ -242,6 +242,8 @@ $app->get('/', function ($request, $response) {
 	//sreturn $response->withStatus(200, 'Okido');
 });
 
+
+
 $app->post('/', function ($request, $response)
 {
 	// get request body and line signature header
@@ -325,36 +327,11 @@ $app->post('/', function ($request, $response)
 
 //________________________________________________________________________messages, DB _____________________________________________________________________________
 
-		// if(strtolower($userMessage) == 'vardump')								// shows all conection data
-		// {
-
-		// 	$host= $_ENV['DATABASE_HOST'];
-		// 	$dbname= $_ENV['DATABASE_NAME'];
-		// 	$user= $_ENV['DATABASE_USERNAME']; 
-		// 	$password= $_ENV['DATABASE_PASSWORD'];
-		// 	$port= $_ENV['DATABASE_PORT'];
-		// 	// $db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
-		// 	$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");	
-		
-		// 	$message = "host=$host, dbname=$dbname, user=$user, password=$password, port=$port";
-        //     $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-		// 	$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-		// 	return $result->getHTTPStatus() . ' ' . $result->getRawBody();
-		// }
 
 		if(strtolower($userMessage) == 'data')									// shows entire test table
 		{
-			// $db = $GLOBALS['db'];
-			// $message = query('SELECT 2 FROM test_table1');
-
-			$host= $_ENV['DATABASE_HOST'];
-			$dbname= $_ENV['DATABASE_NAME'];
-			$user= $_ENV['DATABASE_USERNAME']; 
-			$password= $_ENV['DATABASE_PASSWORD'];
-			$port= $_ENV['DATABASE_PORT'];
-			// $db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
-			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
-
+			require "../connectfun.php";
+			$db_connection = createdb();
 			$message_data = pg_query($db_connection, 'SELECT * FROM test_table1');
 		
 			$message = "";
@@ -375,7 +352,6 @@ $app->post('/', function ($request, $response)
 			$user= $_ENV['DATABASE_USERNAME']; 
 			$password= $_ENV['DATABASE_PASSWORD'];
 			$port= $_ENV['DATABASE_PORT'];
-			// $db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
 			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
 
 			$condition = array('id'=>2, 'day'=>'Friday', 'activity'=>'Promotions');
@@ -388,7 +364,6 @@ $app->post('/', function ($request, $response)
 			while ($row = pg_fetch_row($message_data)) {
 					$message .= "$row[1] : $row[2] - ";
 				}
-			// $message = "host=$blahost, dbname=$dbname, user=$user, password=$password, port=$port";
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
@@ -402,7 +377,6 @@ $app->post('/', function ($request, $response)
 			$user= $_ENV['DATABASE_USERNAME']; 
 			$password= $_ENV['DATABASE_PASSWORD'];
 			$port= $_ENV['DATABASE_PORT'];
-			// $db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password sslmode=require");
 			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
 
 			$condition = array('id'=>2, 'day'=>'Friday', 'activity'=>'Conference');
@@ -415,7 +389,6 @@ $app->post('/', function ($request, $response)
 			while ($row = pg_fetch_row($message_data)) {
 					$message .= "$row[1] : $row[2] - ";
 				}
-			// $message = "host=$blahost, dbname=$dbname, user=$user, password=$password, port=$port";
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
