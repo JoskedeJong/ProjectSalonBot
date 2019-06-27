@@ -391,16 +391,12 @@ $app->post('/', function ($request, $response)
 		if (strpos(strtolower($userMessage), 'appoint')  !== false ){									
 
 			$part = explode(" ", $userMessage);
-			$appointData = array('timestamp'=>date('Y-m-d H:i:s'), 'afspraak'=>"testing");
-
-
-			// $apointData = str_replace('appoint', '', $userMessage);						// removes 'appoint'
+			$composite = $part[1].' '.$part[2];											// timestamp consists of two parts: YYYY-MM-DD and HH:MM:SS
+			$appointData = array('timestamp'=>$composite, 'afspraak'=>$part[3]);
 
 			require "../connectfun.php";												// create connection to db
 			$db_connection = createdb();
 
-			
-			$condition = array('id'=>$part[1], 'timestamp'=>$part[2], 'afspraak'=>$part[3]);
 			pg_insert ($db_connection, 'appointment' , $appointData);
 			// pg_update ($db_connection, 'appointment' , $appointData , $condition);
 			
@@ -410,7 +406,7 @@ $app->post('/', function ($request, $response)
 			// 		$message .= "$row[1] : $row[2] - ";
 			// 	}
 
-			$message = implode($appointData);
+			$message = $composite;
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
