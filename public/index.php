@@ -325,7 +325,7 @@ $app->post('/', function ($request, $response)
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
 		}
 
-//________________________________________________________________________messages, DB _____________________________________________________________________________
+//________________________________________________________________________messages, test _____________________________________________________________________________
 
 
 		if(strtolower($userMessage) == 'data')									// shows entire test table
@@ -338,7 +338,6 @@ $app->post('/', function ($request, $response)
 			while ($row = pg_fetch_row($message_data)) {
 					$message .= "$row[1] : $row[2] - ";
 				}
-			// $message = "host=$blahost, dbname=$dbname, user=$user, password=$password, port=$port";
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
@@ -347,12 +346,8 @@ $app->post('/', function ($request, $response)
 		if(strtolower($userMessage) == 'conf')									// should change Fridays promotions to conference
 		{
 
-			$host= $_ENV['DATABASE_HOST'];
-			$dbname= $_ENV['DATABASE_NAME'];
-			$user= $_ENV['DATABASE_USERNAME']; 
-			$password= $_ENV['DATABASE_PASSWORD'];
-			$port= $_ENV['DATABASE_PORT'];
-			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
+			require "../connectfun.php";
+			$db_connection = createdb();
 
 			$condition = array('id'=>2, 'day'=>'Friday', 'activity'=>'Promotions');
 			$newarr = array('id'=>2, 'day'=>'Friday', 'activity'=>'Conference');
@@ -372,12 +367,8 @@ $app->post('/', function ($request, $response)
 		if(strtolower($userMessage) == 'prom')									// should change Fridays conference to promotions
 		{
 
-			$host= $_ENV['DATABASE_HOST'];
-			$dbname= $_ENV['DATABASE_NAME'];
-			$user= $_ENV['DATABASE_USERNAME']; 
-			$password= $_ENV['DATABASE_PASSWORD'];
-			$port= $_ENV['DATABASE_PORT'];
-			$db_connection = pg_connect("host=$host port=$port dbname=$dbname user=$user password=$password");
+			require "../connectfun.php";
+			$db_connection = createdb();
 
 			$condition = array('id'=>2, 'day'=>'Friday', 'activity'=>'Conference');
 			$newarr = array('id'=>2, 'day'=>'Friday', 'activity'=>'Promotions');
@@ -394,20 +385,51 @@ $app->post('/', function ($request, $response)
 			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
 		}
 
-		
-
-		// if(strtolower($userMessage) == 'open')
-		// {
-		// 	$externalreply=file_get_contents('openingmessage.json');
-		// 	$message = json_decode($externalreply);
-        //     $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-		// 	$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-		// 	return $result->getHTTPStatus() . ' ' . $result->getRawBody();
-		
+//________________________________________________________________________messages, appointment _____________________________________________________________________________
 
 
-		
-		// }
+		if (strpos(strtolower($userMessage), 'appoint')  !== false ){									
+
+			$part = explode(" ", $userMessage);
+			$appointData = array('timestamp'=>date('Y-m-d H:i:s'), 'afspraak'=>"testing");
+
+
+			// $apointData = str_replace('appoint', '', $userMessage);						// removes 'appoint'
+
+			require "../connectfun.php";												// create connection to db
+			$db_connection = createdb();
+
+			
+			$condition = array('id'=>$part[1], 'timestamp'=>$part[2], 'afspraak'=>$part[3]);
+			pg_insert ($db_connection, 'appointment' , $appointData);
+			// pg_update ($db_connection, 'appointment' , $appointData , $condition);
+			
+			// $message_data = pg_query($db_connection, "SELECT * FROM appointment ");
+			// $message = "";
+			// while ($row = pg_fetch_row($message_data)) {
+			// 		$message .= "$row[1] : $row[2] - ";
+			// 	}
+
+			$message = implode($appointData);
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		}
+
+		if(strtolower($userMessage) == 'data2')									// shows entire test table
+		{
+			require "../connectfun.php";
+			$db_connection = createdb();
+
+			$message_data = pg_query($db_connection, "SELECT * FROM appointment");
+			$message = "";
+			while ($row = pg_fetch_row($message_data)) {
+					$message .= "$row[0] : $row[1] : $row[2] - ";
+				}
+            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		}
 
 	}
 
