@@ -392,25 +392,19 @@ $app->post('/', function ($request, $response)
 
 			$part = explode(" ", $userMessage);
 			$composite = $part[1].' '.$part[2];											// timestamp consists of two parts: YYYY-MM-DD and HH:MM:SS
-			$appointData = array('timestamp'=>$composite, 'afspraak'=>$part[3]);
-
-			// $endTime = strtotime("+15 minutes", strtotime($part[2]));					// adds 15 minutes to time-part of input
-			// echo date('h:i:s', $endTime);
 
 			require "../connectfun.php";												// create connection to db
 			$db_connection = createdb();
 
 			$checkfor = pg_query_params($db_connection,'SELECT * FROM appointment WHERE timestamp = $1', array($composite));
+			$intermed = "";
 			while ($row = pg_fetch_row($checkfor)) {
 				$intermed .= "$row[1] : $row[2] - ";	
 			}
 
-			// ob_start();
-			// var_dump($intermed);
-			// $message = ob_get_clean();
-			// echo pg_last_error($db_connection);
+			if ($intermed !== ""){
 
-			if ($intermed !== NULL){
+
 
 				$message = "This timestamp was already taken";
 				// $message = date('Y-m-d h:i:s', $checkfor);
@@ -420,8 +414,10 @@ $app->post('/', function ($request, $response)
 			}
 
 			else{
-				// pg_insert ($db_connection, 'appointment' , $appointData);
-				// $output = $appointData;
+				$addquart = strtotime("+15 minutes", strtotime($part[2]));					// adds 15 minutes to time-part of input
+				$endtime = $part[1].' '.date('h:i:s', $addquart);
+				$appointData = array('timestamp'=>$composite, 'endtime'=>$endtime, 'treatment'=>$part[3]);
+				pg_insert ($db_connection, 'appointment' , $appointData);
 
 				$message = "cool cool";
 				$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
@@ -438,7 +434,7 @@ $app->post('/', function ($request, $response)
 			$message_data = pg_query($db_connection, "SELECT * FROM appointment");
 			$message = "";
 			while ($row = pg_fetch_row($message_data)) {
-					$message .= "$row[0] : $row[1] : $row[2] - ";
+					$message .= "$row[0] : $row[1] : $row[2] : $row[3] - ";
 				}
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
