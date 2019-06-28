@@ -388,7 +388,8 @@ $app->post('/', function ($request, $response)
 //________________________________________________________________________messages, appointment _____________________________________________________________________________
 
 
-		if (strpos(strtolower($userMessage), 'appoint')  !== false ){									
+		if (strpos(strtolower($userMessage), 'appoint')  !== false ){					// an entry that contains appoint can be used to set appointment
+																						// note that the current code forces the entry to start with 'appont'					
 
 			$part = explode(" ", $userMessage);
 			$startTime = $part[1].' '.$part[2];											// timestamp consists of two parts: YYYY-MM-DD and HH:MM:SS
@@ -403,72 +404,36 @@ $app->post('/', function ($request, $response)
 			$test2 = "";
 			$startTimeCheck = pg_query($db_connection, "SELECT * FROM appointment WHERE timestamp <= '".$startTime."' AND endtime >= '".$startTime."'");
 			$endTimeCheck = pg_query($db_connection, "SELECT * FROM appointment WHERE timestamp <= '".$endTime."' AND endtime >= '".$endTime."'");
+																						// queries look to see if given start- and endtime are between start- and endtimes in database
+
 
 		
-			while ($row = pg_fetch_row($startTimeCheck)) {
+			while ($row = pg_fetch_row($startTimeCheck)) {								// ugh this code is ugly
 				$test1 .= "$row[1] : $row[2] - ";	
 			}
 			while ($row = pg_fetch_row($endTimeCheck)) {
 				$test2 .= "$row[1] : $row[2] - ";	
 			}
 
-			// $message = $test1;
-			// $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-			// $result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-			// return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+	
 
-
-
-
-			if (($test1 !== "") || ($test2 !== "")){
-
+			if (($test1 !== "") || ($test2 !== "")){									// test if either startTimeCheck or endTimeCheck gave a positive
+																						// if positive, time was already taken
 				$message = "This timestamp was already taken";
-				// $message = date('Y-m-d h:i:s', $checkfor);
 				$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 				$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
 				return $result->getHTTPStatus() . ' ' . $result->getRawBody();
 			}
-			else{
+			else{																		// if not, time can freely be planned
+				$appointData = array('timestamp'=>$startTime, 'endtime'=>$endTime, 'treatment'=>$part[3]);
+				pg_insert ($db_connection, 'appointment' , $appointData);
 
-				$message = "cool cool";
+				$message = "This timestamp is available. Appointment made.";
 				$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 				$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
 				return $result->getHTTPStatus() . ' ' . $result->getRawBody();
 			}
 
-
-
-
-
-
-			// $checkfor = pg_query_params($db_connection,'SELECT * FROM appointment WHERE timestamp = $1', array($composite));
-
-			// $intermed = "";
-			// while ($row = pg_fetch_row($checkfor)) {
-			// 	$intermed .= "$row[1] : $row[2] - ";	
-			// }
-
-			// if ($intermed !== ""){
-			// 	$message = "This timestamp was already taken";
-			// 	// $message = date('Y-m-d h:i:s', $checkfor);
-			// 	$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-			// 	$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-			// 	return $result->getHTTPStatus() . ' ' . $result->getRawBody();
-			// }
-
-			// // $checkfor = pg_query_params($db_connection,'SELECT * FROM appointment WHERE timestamp = $1', array($part[1]));
-
-			// else{
-			// 	$addquart = strtotime("+15 minutes", strtotime($part[2]));					// adds 15 minutes to time-part of input
-			// 	$endtime = $part[1].' '.date('h:i:s', $addquart);
-			// 	$appointData = array('timestamp'=>$composite, 'endtime'=>$endtime, 'treatment'=>$part[3]);
-			// 	// pg_insert ($db_connection, 'appointment' , $appointData);
-
-			// 	$message = "cool cool";
-			// 	$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-			// 	$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-			// 	return $result->getHTTPStatus() . ' ' . $result->getRawBody();
-			// }
 		}
 
 		if(strtolower($userMessage) == 'data2')											// shows entire appointment table
