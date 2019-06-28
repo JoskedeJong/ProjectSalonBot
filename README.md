@@ -14,8 +14,8 @@ Goal: to expand a pre-created PHP bot for the Line app to accommodate to the nee
 * [x] allow user to write data to appointment table using a timestamp format
 * * [x] replace hard-code for free input.
 * [x] make check to refuse duplicate appointments
-* [ ] set duration of appointment to minimum of 15 minutes
-* [ ] make duplicate check account for extended duration
+* [x] set duration of appointment to minimum of 15 minutes
+* [x] make duplicate check account for extended duration
 * * [ ] duration to be set by selected treatment from prior database
 * [ ] create check for opening-times
 * [ ] create response if appointment is not within opening times
