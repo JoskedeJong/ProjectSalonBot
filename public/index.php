@@ -317,13 +317,13 @@ $app->post('/', function ($request, $response)
 		
 		}
 
-		if(strtolower($userMessage) == 'tarieven')
-		{
-			$message = "De tarieven zijn: 50 euro per behandeling";
-            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
-		}
+		// if(strtolower($userMessage) == 'tarieven')
+		// {
+		// 	$message = "De tarieven zijn: 50 euro per behandeling";
+        //     $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+		// 	$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+		// 	return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+		// }
 
 //________________________________________________________________________messages, test _____________________________________________________________________________
 
@@ -378,7 +378,7 @@ $app->post('/', function ($request, $response)
 		
 			$message = "";
 			while ($row = pg_fetch_row($message_data)) {
-					$message .= "$row[1] : $row[2] - ";
+					$message .= "$row[1] : $row[2] - ";	
 				}
             $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
 			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
@@ -394,25 +394,43 @@ $app->post('/', function ($request, $response)
 			$composite = $part[1].' '.$part[2];											// timestamp consists of two parts: YYYY-MM-DD and HH:MM:SS
 			$appointData = array('timestamp'=>$composite, 'afspraak'=>$part[3]);
 
+			// $endTime = strtotime("+15 minutes", strtotime($part[2]));					// adds 15 minutes to time-part of input
+			// echo date('h:i:s', $endTime);
+
 			require "../connectfun.php";												// create connection to db
 			$db_connection = createdb();
 
-			pg_insert ($db_connection, 'appointment' , $appointData);
-			// pg_update ($db_connection, 'appointment' , $appointData , $condition);
-			
-			// $message_data = pg_query($db_connection, "SELECT * FROM appointment ");
-			// $message = "";
-			// while ($row = pg_fetch_row($message_data)) {
-			// 		$message .= "$row[1] : $row[2] - ";
-			// 	}
+			$checkfor = pg_query_params($db_connection,'SELECT * FROM appointment WHERE timestamp = $1', array($composite));
+			while ($row = pg_fetch_row($checkfor)) {
+				$intermed .= "$row[1] : $row[2] - ";	
+			}
 
-			$message = $composite;
-            $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
-			$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
-			return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+			// ob_start();
+			// var_dump($intermed);
+			// $message = ob_get_clean();
+			// echo pg_last_error($db_connection);
+
+			if ($intermed !== NULL){
+
+				$message = "This timestamp was already taken";
+				// $message = date('Y-m-d h:i:s', $checkfor);
+				$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+				$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+				return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+			}
+
+			else{
+				// pg_insert ($db_connection, 'appointment' , $appointData);
+				// $output = $appointData;
+
+				$message = "cool cool";
+				$textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder($message);
+				$result = $bot->replyMessage($event['replyToken'], $textMessageBuilder);
+				return $result->getHTTPStatus() . ' ' . $result->getRawBody();
+			}
 		}
 
-		if(strtolower($userMessage) == 'data2')									// shows entire test table
+		if(strtolower($userMessage) == 'data2')											// shows entire appointment table
 		{
 			require "../connectfun.php";
 			$db_connection = createdb();
